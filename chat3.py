@@ -1,3 +1,5 @@
+#doing some tasks in the computer
+
 import speech_recognition as sr
 import pyttsx3
 import os
@@ -31,13 +33,22 @@ def recognize_speech():
         print("Recognizing...")
         text = recognizer.recognize_google(audio)
         print("You said:", text)
-        return text
+        return text.lower()
     except sr.UnknownValueError:
         print("Sorry, I didn't catch that.")
         return None
     except sr.RequestError as e:
         print("Could not request results; {0}".format(e))
         return None
+
+# Function to perform actions based on voice commands
+def perform_action(command):
+    if "open" in command:
+        software_name = command.split("open ")[-1]  # Extract the name of the software
+        os.system(f"start {software_name}")  # Open the specified software
+    else:
+        response = chat_with_openai(command)
+        speak(response)
 
 # Function to interact with OpenAI API
 def chat_with_openai(prompt):
@@ -59,26 +70,16 @@ def chat_with_openai(prompt):
         print("Response object:", response)
         return "I'm sorry, but I couldn't process your request at the moment."
     
-# Function to perform actions based on voice commands
-def perform_action(command):
-    if "open" in command:
-        software_name = command.split("open ")[-1]  # Extract the name of the software
-        os.system(f"start {software_name}")  # Open the specified software
-    else:
-        speak("I'm sorry, I didn't understand that command.")
-
-
 # Main function
 def main():
     speak("Hello! How can I assist you today?")
     while True:
         query = recognize_speech()
         if query:
-            if query.lower() == "exit":
+            if query == "exit":
                 speak("Goodbye!")
                 break
-            response = chat_with_openai(query)
-            speak(response)
+            perform_action(query)
 
 if __name__ == "__main__":
     main()
